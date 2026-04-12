@@ -1,5 +1,5 @@
 {
-  "name": "情绪光语站 (Emotion Light Station)",
+  "name": "情绪光语站",
   "description": "实时心率监测与情绪可视化系统，提供个人情绪日记及班级匿名情绪热力图分析。",
   "requestFramePermissions": [
     "bluetooth"
