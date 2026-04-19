@@ -6,6 +6,7 @@ export const Navbar: React.FC = () => {
 
   const navItems = [
     { id: 'features', label: '核心功能' },
+    { id: 'piano', label: '情绪钢琴' },
     { id: 'workflow', label: '工作原理' },
     { id: 'privacy', label: '隐私安全' },
     { id: 'contact', label: '联系我们' },

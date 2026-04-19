@@ -6,6 +6,7 @@
 import React from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
+import { MoodPiano } from './components/MoodPiano';
 import { Heart } from 'lucide-react';
 
 export default function App() {
@@ -15,6 +16,9 @@ export default function App() {
 
       <main>
         <Hero />
+        <section id="piano" className="bg-white">
+          <MoodPiano />
+        </section>
       </main>
 
       <footer className="py-16 border-t border-gray-100 bg-white">
