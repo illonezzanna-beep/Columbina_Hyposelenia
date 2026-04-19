@@ -26,10 +26,13 @@ const KEYS = [
 ];
 
 const MOODS = [
-  { id: 'calm', label: '宁静', color: '#6366f1', type: 'sine', reverb: 0.8 },
-  { id: 'joy', label: '欢乐', color: '#f59e0b', type: 'triangle', reverb: 0.4 },
-  { id: 'energy', label: '活力', color: '#10b981', type: 'square', reverb: 0.2 },
-  { id: 'dreamy', label: '梦幻', color: '#a855f7', type: 'sawtooth', reverb: 0.9 },
+  { id: 'calm', label: '平静', color: '#FFFFFF', type: 'sine', reverb: 0.8 },
+  { id: 'joy', label: '愉悦', color: '#FFB6C1', type: 'triangle', reverb: 0.4 },
+  { id: 'excited', label: '兴奋', color: '#FFC0CB', type: 'sine', reverb: 0.2 },
+  { id: 'anxious', label: '焦虑', color: '#00FF00', type: 'square', reverb: 0.3 },
+  { id: 'anger', label: '愤怒', color: '#FF0000', type: 'sawtooth', reverb: 0.1 },
+  { id: 'fear', label: '恐惧', color: '#800080', type: 'square', reverb: 0.9 },
+  { id: 'sad', label: '悲伤', color: '#0000FF', type: 'sine', reverb: 1.2 },
 ];
 
 export const MoodPiano: React.FC = () => {

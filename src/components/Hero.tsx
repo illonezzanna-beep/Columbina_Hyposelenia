@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Heart, Zap, BarChart3, Shield, ArrowRight, Sparkles, Layout, Eye, Activity } from 'lucide-react';
+import { Heart, Zap, BarChart3, Shield, ArrowRight, Sparkles, Layout, Eye, Activity, Cpu, Database, Share2, Code } from 'lucide-react';
 
 export const Hero: React.FC = () => {
   return (
@@ -17,18 +17,18 @@ export const Hero: React.FC = () => {
             transition={{ duration: 0.8 }}
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 text-sm font-bold text-indigo-600 bg-indigo-50 rounded-full border border-indigo-100">
-              <Sparkles className="w-4 h-4" />
-              <span>2026 校园心理健康创新方案</span>
+              <Cpu className="w-4 h-4" />
+              <span>硬件驱动 · 实时情绪追踪</span>
             </div>
             <h1 className="text-6xl md:text-8xl font-black text-gray-900 mb-8 tracking-tight leading-[1.1]">
-              让情绪<br />
+              用代码记录<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-violet-500 to-purple-500">
-                拥有色彩与语言
+                每一次心跳波动
               </span>
             </h1>
             <p className="max-w-3xl mx-auto text-xl md:text-2xl text-gray-500 mb-12 leading-relaxed font-medium">
-              情绪光语站：结合生物反馈技术与艺术可视化，<br className="hidden md:block" />
-              为校园提供实时、科学、温暖的情绪认知与群体心理监测方案。
+              情绪气象站：基于 ESP32 与高精度心率传感器的智能健康系统。<br className="hidden md:block" />
+              每5秒自动采样，24路全彩 LED 实时映射，CSV 级专业报告导出。
             </p>
             
             <div className="flex flex-wrap justify-center gap-6">
@@ -36,16 +36,16 @@ export const Hero: React.FC = () => {
                 onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
                 className="px-10 py-5 bg-indigo-600 text-white rounded-2xl font-bold text-lg hover:bg-indigo-700 transition-all shadow-2xl shadow-indigo-200 flex items-center gap-2 group"
               >
-                了解核心功能
+                查看核心功能
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
               <button className="px-10 py-5 bg-white text-gray-900 border-2 border-gray-100 rounded-2xl font-bold text-lg hover:border-indigo-100 hover:bg-indigo-50/30 transition-all">
-                查看演示视频
+                硬件规格书
               </button>
             </div>
           </motion.div>
 
-          {/* Product Preview Mockup */}
+          {/* Device Mockup */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
@@ -53,74 +53,131 @@ export const Hero: React.FC = () => {
             transition={{ duration: 1, delay: 0.2 }}
             className="mt-24 relative max-w-5xl mx-auto"
           >
-            <div className="aspect-[16/9] bg-gradient-to-br from-gray-900 to-indigo-900 rounded-[3rem] shadow-3xl overflow-hidden border-[12px] border-white ring-1 ring-gray-100">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-48 h-48 rounded-full bg-indigo-500/20 blur-3xl animate-pulse" />
-                <div className="relative z-10 text-center">
-                  <Heart className="w-20 h-20 text-indigo-400 mx-auto mb-4 animate-bounce" />
-                  <div className="text-white/40 font-mono text-sm tracking-widest uppercase">系统初始化中...</div>
-                </div>
-              </div>
-              {/* Decorative UI elements */}
-              <div className="absolute top-8 left-8 flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-red-400" />
-                <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                <div className="w-3 h-3 rounded-full bg-green-400" />
-              </div>
-            </div>
-            {/* Floating Badges */}
-            <div className="absolute -top-6 -right-6 bg-white p-6 rounded-3xl shadow-xl border border-gray-50 hidden lg:block">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-emerald-100 rounded-2xl flex items-center justify-center">
-                  <Activity className="w-6 h-6 text-emerald-600" />
-                </div>
-                <div className="text-left">
-                  <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">实时心率</div>
-                  <div className="text-2xl font-black text-gray-900">72 BPM</div>
-                </div>
-              </div>
+            <div className="relative aspect-[16/9] bg-gray-900 rounded-[3rem] shadow-3xl overflow-hidden border-[12px] border-white ring-1 ring-gray-100 p-12">
+               {/* NeoPixel Ring Simulation */}
+               <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="relative w-80 h-80 rounded-full border-[10px] border-gray-800 flex items-center justify-center">
+                    {Array.from({ length: 24 }).map((_, i) => (
+                      <motion.div
+                        key={i}
+                        animate={{ 
+                          opacity: [0.3, 1, 0.3],
+                          scale: [1, 1.1, 1],
+                          backgroundColor: ['#ffffff', '#ffb6c1', '#ffffff']
+                        }}
+                        transition={{ 
+                          duration: 2, 
+                          repeat: Infinity, 
+                          delay: i * 0.05 
+                        }}
+                        className="absolute w-4 h-4 rounded-full blur-[2px] shadow-lg"
+                        style={{
+                          transform: `rotate(${i * 15}deg) translateY(-145px)`
+                        }}
+                      />
+                    ))}
+                    <div className="text-center z-10">
+                      <Heart className="w-16 h-16 text-rose-500 mx-auto mb-2 animate-pulse fill-rose-500/20" />
+                      <div className="text-4xl font-black text-white">75</div>
+                      <div className="text-[10px] text-gray-500 font-bold tracking-[0.2em]">BASELINE BPM</div>
+                    </div>
+                  </div>
+               </div>
+               
+               {/* Floating Overlay Status */}
+               <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end">
+                  <div className="bg-black/40 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/10 text-left">
+                    <div className="text-[10px] font-bold text-gray-400 uppercase mb-1">系统状态</div>
+                    <div className="flex items-center gap-2">
+                       <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
+                       <span className="text-white font-bold">WiFi 已连接: SparkMinds_IOT</span>
+                    </div>
+                  </div>
+                  <div className="bg-indigo-600 px-6 py-4 rounded-2xl shadow-xl text-left">
+                    <div className="text-[10px] font-bold text-indigo-200 uppercase mb-1">心情日记</div>
+                    <div className="text-white font-black text-xl">已记录 432 条</div>
+                  </div>
+               </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Code / Algorithm Preview Section */}
+      <section className="py-24 bg-gray-900 border-y border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+           <div>
+              <div className="w-12 h-12 bg-indigo-500/20 rounded-xl flex items-center justify-center mb-6">
+                <Code className="w-6 h-6 text-indigo-400" />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">更精细的情绪分级算法</h2>
+              <p className="text-gray-400 text-lg leading-relaxed mb-8">
+                不同于简单的三段式判断，我们基于基准心率（BASELINE_HR）的偏移量，
+                细化了七个维度的情绪反馈模型。每一段 5 秒的自动采样都能精准映射出最真实的心境。
+              </p>
+              <ul className="space-y-4">
+                {[
+                  { label: "平静", diff: "±10 BPM", color: "bg-white" },
+                  { label: "焦虑", diff: "+10~20 BPM", color: "bg-green-500" },
+                  { label: "恐惧", diff: ">30 BPM", color: "bg-purple-600" }
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-4 text-gray-300">
+                    <div className={`w-3 h-3 rounded-full ${item.color}`} />
+                    <span className="font-bold w-16">{item.label}</span>
+                    <span className="text-gray-500">心率偏移值: {item.diff}</span>
+                  </li>
+                ))}
+              </ul>
+           </div>
+           <div className="bg-[#0f1117] p-8 rounded-3xl border border-white/5 shadow-2xl relative">
+              <div className="absolute top-4 right-6 text-indigo-400/50 font-mono text-xs">firmware.ino</div>
+              <pre className="text-xs md:text-sm font-mono text-indigo-100/80 overflow-auto">
+                <code>{`uint32_t getEmotionColor(int hr) {
+  if (hr <= 0) return COLOR_YELLOW;
+  int diff = hr - 75;
+  if (diff >= -10 && diff <= 10) return COLOR_WHITE;
+  if (diff > 10 && diff <= 20) return COLOR_GREEN;
+  if (diff > 20 && diff <= 30) return COLOR_RED;
+  if (diff > 30) return COLOR_PURPLE;
+  return COLOR_BLUE;
+}
+
+// 自动采样逻辑
+if (millis() - lastRecordTime >= 5000) {
+  autoAddMoodRecord();
+}`}</code>
+              </pre>
+           </div>
+        </div>
+      </section>
+
+      {/* Main Features Section */}
       <section id="features" className="py-32 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">四大核心功能</h2>
-            <p className="text-xl text-gray-500">全方位守护学生心理健康，助力智慧校园建设</p>
+            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">全栈软硬一体方案</h2>
+            <p className="text-xl text-gray-500">从底层传感器采样到云端数据导出的完整闭环</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                title: '实时心率监测',
-                desc: '采用高精度生物传感器，毫秒级捕捉心率变异性（HRV），为情绪判断提供坚实的生理数据基础。',
-                icon: Heart,
-                color: 'bg-rose-50 text-rose-600',
-                image: 'https://picsum.photos/seed/heart/800/600'
+                title: '硬件实时同步',
+                desc: '集成 24 路 NeoPixel 灯环，通过 Serial 硬件级同步心率，让抽象的心跳化为空间的色彩。',
+                icon: Cpu,
+                color: 'bg-indigo-50 text-indigo-600'
               },
               {
-                title: '情绪智能判断',
-                desc: '内置自研情绪识别算法，自动分析心率特征，精准识别“平静、兴奋、焦虑、压力”等多种心理状态。',
-                icon: Zap,
-                color: 'bg-amber-50 text-amber-600',
-                image: 'https://picsum.photos/seed/brain/800/600'
+                title: '5秒自动采样',
+                desc: '无需手动干预，系统每 5 秒自动上传心率快照，构建长达 500 条的连续情绪流，支持 NTP 时间校准。',
+                icon: Database,
+                color: 'bg-emerald-50 text-emerald-600'
               },
               {
-                title: '色彩可视化反馈',
-                desc: '将抽象情绪转化为流动的LED光语。通过直观的色彩语言，帮助学生建立情绪认知，实现即时心理调节。',
-                icon: Eye,
-                color: 'bg-indigo-50 text-indigo-600',
-                image: 'https://picsum.photos/seed/light/800/600'
-              },
-              {
-                title: '班级群体分析',
-                desc: '自动生成匿名化“情绪热力图”与趋势曲线。在严格保护隐私的前提下，协助教师掌握班级整体心理节奏。',
-                icon: BarChart3,
-                color: 'bg-emerald-50 text-emerald-600',
-                image: 'https://picsum.photos/seed/chart/800/600'
+                title: '多维数据导出',
+                desc: '内置 WebServer 仪表盘，支持按“今日、本周、全部”维度筛选，并可一键导出 CSV 专业报表。',
+                icon: Share2,
+                color: 'bg-rose-50 text-rose-600'
               }
             ].map((feature, i) => (
               <motion.div
@@ -129,102 +186,67 @@ export const Hero: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="group p-10 rounded-[3rem] bg-gray-50 border border-transparent hover:border-indigo-100 hover:bg-white hover:shadow-2xl hover:shadow-indigo-100/50 transition-all duration-500"
+                className="group p-8 rounded-[2.5rem] bg-gray-50 border border-transparent hover:border-indigo-100 hover:bg-white hover:shadow-2xl hover:shadow-indigo-100/50 transition-all duration-500"
               >
-                <div className={`w-16 h-16 ${feature.color} rounded-2xl flex items-center justify-center mb-8 shadow-sm`}>
-                  <feature.icon className="w-8 h-8" />
+                <div className={`w-14 h-14 ${feature.color} rounded-2xl flex items-center justify-center mb-6 shadow-sm`}>
+                  <feature.icon className="w-6 h-6" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">{feature.title}</h3>
-                <p className="text-gray-500 leading-relaxed text-lg mb-8">{feature.desc}</p>
-                <div className="rounded-2xl overflow-hidden aspect-video relative">
-                  <img src={feature.image} alt={feature.title} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700" referrerPolicy="no-referrer" />
-                  <div className="absolute inset-0 bg-indigo-900/10 group-hover:bg-transparent transition-colors" />
-                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-4">{feature.title}</h3>
+                <p className="text-gray-500 leading-relaxed text-base">{feature.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Workflow Section */}
-      <section id="workflow" className="py-32 bg-indigo-600 text-white overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 blur-[100px] rounded-full -mr-48 -mt-48" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-black mb-8">简单三步，<br />开启情绪认知之旅</h2>
-              <div className="space-y-10">
-                {[
-                  { step: '01', title: '佩戴与同步', desc: '学生佩戴轻便的传感器设备，系统自动通过蓝牙建立连接。' },
-                  { step: '02', title: '实时感知', desc: '系统实时分析生理数据，光语站根据情绪状态变换灯光色彩。' },
-                  { step: '03', title: '数据沉淀', desc: '自动生成个人情绪日记与班级匿名报告，提供科学的心理参考。' }
-                ].map((item, i) => (
-                  <div key={i} className="flex gap-6">
-                    <div className="text-4xl font-black opacity-30">{item.step}</div>
-                    <div>
-                      <h4 className="text-xl font-bold mb-2">{item.title}</h4>
-                      <p className="text-indigo-100 leading-relaxed">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+      {/* Tech Details Table (High-end addition) */}
+      <section className="py-32 bg-[#fafafa]">
+         <div className="max-w-5xl mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-16">硬件配置与引脚定义</h2>
+            <div className="bg-white rounded-[2.5rem] border border-gray-100 overflow-hidden shadow-sm">
+               <table className="w-full text-left border-collapse">
+                  <thead>
+                     <tr className="bg-gray-50 border-b border-gray-100">
+                        <th className="px-8 py-5 text-sm font-bold text-gray-500 uppercase tracking-widest">模块</th>
+                        <th className="px-8 py-5 text-sm font-bold text-gray-500 uppercase tracking-widest">配置</th>
+                        <th className="px-8 py-5 text-sm font-bold text-gray-500 uppercase tracking-widest">引脚 / 定义</th>
+                     </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                     {[
+                        { module: "主控单元", config: "ESP32 Series", pin: "WiFi / WebServer (80)" },
+                        { module: "心率传感器", config: "UART 38400bps", pin: "RX: 8 / TX: 9" },
+                        { module: "交互反馈", config: "24-Bit NeoPixel", pin: "IO: 3" },
+                        { module: "采样间隔", config: "MoodRecord (500 MAX)", pin: "Interval: 5000ms" },
+                        { module: "触摸分级", config: "T2 / T5 / HG", pin: "IO: 2, 5, 4" },
+                     ].map((row, i) => (
+                        <tr key={i} className="hover:bg-indigo-50/30 transition-colors">
+                           <td className="px-8 py-6 font-bold text-gray-900">{row.module}</td>
+                           <td className="px-8 py-6 text-gray-600">{row.config}</td>
+                           <td className="px-8 py-6 font-mono text-indigo-600 text-sm">{row.pin}</td>
+                        </tr>
+                     ))}
+                  </tbody>
+               </table>
             </div>
-            <div className="relative">
-              <div className="aspect-square bg-white/10 rounded-[4rem] backdrop-blur-3xl border border-white/20 p-12 flex items-center justify-center">
-                <Layout className="w-full h-full text-white/20" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <motion.div
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-48 h-48 bg-white rounded-full shadow-2xl flex items-center justify-center"
-                  >
-                    <Heart className="w-20 h-20 text-indigo-600 fill-current" />
-                  </motion.div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Privacy Section */}
-      <section id="privacy" className="py-32 bg-white">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-10">
-            <Shield className="w-10 h-10" />
-          </div>
-          <h2 className="text-4xl font-black text-gray-900 mb-8">隐私安全是我们的底线</h2>
-          <p className="text-xl text-gray-500 leading-relaxed mb-12">
-            我们深知心理数据的敏感性。情绪光语站采用端到端加密技术，
-            所有生成的群体报告均经过严格的匿名化处理，确保不暴露任何具体学生的个人身份与隐私。
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {['匿名化处理', '本地加密存储', '符合教育安全标准'].map((item, i) => (
-              <div key={i} className="px-6 py-4 bg-gray-50 rounded-2xl font-bold text-gray-700 border border-gray-100">
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
+         </div>
       </section>
 
       {/* CTA Section */}
       <section id="contact" className="py-32 bg-gray-50">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="bg-white rounded-[4rem] p-12 md:p-20 border border-gray-100 shadow-2xl text-center relative overflow-hidden">
-            <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-indigo-500/5 blur-3xl rounded-full" />
-            <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-8">准备好为您的校园<br />注入情绪色彩了吗？</h2>
-            <p className="text-xl text-gray-500 mb-12 max-w-2xl mx-auto">
-              联系我们的教育专家，获取定制化的校园心理健康解决方案。
+          <div className="bg-indigo-600 rounded-[4rem] p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
+            <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-white/10 blur-[100px] rounded-full" />
+            <h2 className="text-4xl md:text-5xl font-black text-white mb-8">开启专业级<br />情绪量化监测</h2>
+            <p className="text-xl text-indigo-100 mb-12 max-w-2xl mx-auto">
+              不仅仅是灯光，更是每一份真实的心理快照。立即获取完整硬件清单与烧录指南。
             </p>
             <div className="flex flex-wrap justify-center gap-4">
-              <input 
-                type="email" 
-                placeholder="输入您的邮箱地址" 
-                className="px-8 py-5 bg-gray-50 border-2 border-transparent focus:border-indigo-500 focus:bg-white rounded-2xl outline-none w-full md:w-80 transition-all font-medium"
-              />
-              <button className="px-10 py-5 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100">
-                提交申请
+              <button className="px-10 py-5 bg-white text-indigo-600 rounded-2xl font-bold text-lg hover:bg-indigo-50 transition-all shadow-xl">
+                下载原理图 (PDF)
+              </button>
+              <button className="px-10 py-5 bg-indigo-900 text-white rounded-2xl font-bold text-lg hover:bg-indigo-950 transition-all">
+                加入开发者群
               </button>
             </div>
           </div>

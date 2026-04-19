@@ -29,7 +29,7 @@ export default function App() {
                 <Heart className="w-5 h-5 text-white fill-current" />
               </div>
               <span className="text-xl font-bold tracking-tight text-gray-900">
-                情绪光语站
+                情绪气象站
               </span>
             </div>
             <div className="flex gap-8 text-sm font-medium text-gray-400">
@@ -38,7 +38,7 @@ export default function App() {
               <a href="#" className="hover:text-indigo-600 transition-colors">关于我们</a>
             </div>
             <p className="text-gray-400 text-sm">
-              © 2026 情绪光语站 (Emotion Light Station). All rights reserved.
+              © 2026 情绪气象站 (Emotion Weather Station). All rights reserved.
             </p>
           </div>
         </div>

@@ -29,7 +29,7 @@ export const Navbar: React.FC = () => {
               <Heart className="w-6 h-6 text-white fill-current" />
             </div>
             <span className="text-2xl font-bold tracking-tight text-gray-900">
-              情绪光语站
+              情绪气象站
             </span>
           </div>
           
