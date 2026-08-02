@@ -6,6 +6,8 @@
 import React from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
+import { DatabaseUploadAnalytics } from './components/DatabaseUploadAnalytics';
+import { TeacherDashboard } from './components/TeacherDashboard';
 import { MoodPiano } from './components/MoodPiano';
 import { Heart } from 'lucide-react';
 
@@ -16,7 +18,13 @@ export default function App() {
 
       <main>
         <Hero />
-        <section id="piano" className="bg-white">
+        <section id="database" className="bg-white border-y border-gray-100">
+          <DatabaseUploadAnalytics />
+        </section>
+        <section id="dashboard">
+          <TeacherDashboard />
+        </section>
+        <section id="piano">
           <MoodPiano />
         </section>
       </main>
@@ -29,7 +37,7 @@ export default function App() {
                 <Heart className="w-5 h-5 text-white fill-current" />
               </div>
               <span className="text-xl font-bold tracking-tight text-gray-900">
-                情绪气象站
+                心情光语站
               </span>
             </div>
             <div className="flex gap-8 text-sm font-medium text-gray-400">
@@ -38,7 +46,7 @@ export default function App() {
               <a href="#" className="hover:text-indigo-600 transition-colors">关于我们</a>
             </div>
             <p className="text-gray-400 text-sm">
-              © 2026 情绪气象站 (Emotion Weather Station). All rights reserved.
+              © 2026 心情光语站 (Mood Light Station). All rights reserved.
             </p>
           </div>
         </div>

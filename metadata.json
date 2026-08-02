@@ -1,6 +1,6 @@
 {
-  "name": "情绪气象站",
-  "description": "基于心率反馈的智能情绪分析系统，提供自动心情记录、可视化灯效与专业数据导出功能。",
+  "name": "心情光语站",
+  "description": "基于心率反馈的智能心情分析系统，提供自动心情记录、可视化灯效与班级趋势监测功能。",
   "requestFramePermissions": [
     "bluetooth"
   ]

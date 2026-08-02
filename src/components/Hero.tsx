@@ -27,8 +27,8 @@ export const Hero: React.FC = () => {
               </span>
             </h1>
             <p className="max-w-3xl mx-auto text-xl md:text-2xl text-gray-500 mb-12 leading-relaxed font-medium">
-              情绪气象站：基于 ESP32 与高精度心率传感器的智能健康系统。<br className="hidden md:block" />
-              每5秒自动采样，24路全彩 LED 实时映射，CSV 级专业报告导出。
+              心情光语站：基于 ESP32 与高精度心率传感器的智能健康系统。<br className="hidden md:block" />
+              每5秒自动采样，24路全彩 LED 实时映射，班级情绪趋势实时监听。
             </p>
             
             <div className="flex flex-wrap justify-center gap-6">

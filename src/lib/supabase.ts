@@ -1,11 +1,21 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const rawUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Fallback for development if keys are not provided yet
-export const supabase = (supabaseUrl && supabaseAnonKey) 
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null;
+let formattedUrl = rawUrl ? rawUrl.trim() : '';
+if (formattedUrl && !/^https?:\/\//i.test(formattedUrl)) {
+  formattedUrl = 'https://' + formattedUrl;
+}
 
-export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
+let clientInstance = null;
+if (formattedUrl && supabaseAnonKey) {
+  try {
+    clientInstance = createClient(formattedUrl, supabaseAnonKey);
+  } catch (err) {
+    console.error('Failed to create Supabase client:', err);
+  }
+}
+
+export const supabase = clientInstance;
+export const isSupabaseConfigured = !!(formattedUrl && supabaseAnonKey && clientInstance);

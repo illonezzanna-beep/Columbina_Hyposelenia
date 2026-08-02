@@ -5,11 +5,11 @@ export const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const navItems = [
+    { id: 'database', label: '数据上报与统计' },
+    { id: 'dashboard', label: '工作台' },
     { id: 'features', label: '核心功能' },
     { id: 'piano', label: '情绪钢琴' },
-    { id: 'workflow', label: '工作原理' },
     { id: 'privacy', label: '隐私安全' },
-    { id: 'contact', label: '联系我们' },
   ];
 
   const scrollToSection = (id: string) => {
@@ -29,7 +29,7 @@ export const Navbar: React.FC = () => {
               <Heart className="w-6 h-6 text-white fill-current" />
             </div>
             <span className="text-2xl font-bold tracking-tight text-gray-900">
-              情绪气象站
+              心情光语站
             </span>
           </div>
           

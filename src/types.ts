@@ -1,21 +1,49 @@
-export type EmotionType = 'Calm' | 'Joy' | 'Excited' | 'Anxious' | 'Anger' | 'Fear' | 'Sad' | 'Wait';
-
-export interface HeartRateRecord {
-  id: string;
-  user_id: string;
+export interface UploadDataPayload {
+  device_id: string;
+  emotion: string;
   heart_rate: number;
-  emotion: EmotionType;
-  created_at: string;
-  class_id?: string;
+  timestamp?: string;
 }
 
-export const EMOTION_CONFIG: Record<EmotionType, { color: string; label: string; description: string }> = {
-  Calm: { color: '#FFFFFF', label: '平静', description: '心率平稳，情绪安定' },
-  Joy: { color: '#FFB6C1', label: '愉悦', description: '心率轻快，心情舒畅' },
-  Excited: { color: '#FFC0CB', label: '兴奋', description: '心率略高，充满活力' },
-  Anxious: { color: '#00FF00', label: '焦虑', description: '心率波动，感到不安' },
-  Anger: { color: '#FF0000', label: '愤怒', description: '心率急促，情绪波动强烈' },
-  Fear: { color: '#800080', label: '恐惧', description: '心率剧变，处于极度紧张' },
-  Sad: { color: '#0000FF', label: '悲伤', description: '心率低迷，情绪沉重' },
-  Wait: { color: '#FFFF00', label: '等待', description: '正在获取心率数据...' },
+export interface MqttEmotionData {
+  timestamp: string;
+  heartRate: number;
+  emotion: string;
+  emotionColor: string;
+  deviceId: string;
+}
+
+export interface DatabaseRecord {
+  id: string;
+  device_id: string;
+  heart_rate: number;
+  emotion: string;
+  emotion_color: string;
+  created_at: string;
+}
+
+export interface PieChartItem {
+  name: string;
+  count: number;
+  percentage: number;
+  color: string;
+}
+
+export interface DatabaseStats {
+  success: boolean;
+  totalRecords: number;
+  avgHeartRate: number;
+  deviceCount: number;
+  allDevices: string[];
+  pieChartData: PieChartItem[];
+}
+
+export const EMOTION_MAP: Record<string, string> = {
+  '平静': '#FFFFFF',
+  '愉悦': '#FFB6C1',
+  '兴奋': '#FFC0CB',
+  '焦虑': '#00FF00',
+  '愤怒': '#FF0000',
+  '恐惧': '#800080',
+  '悲伤': '#0000FF'
 };
