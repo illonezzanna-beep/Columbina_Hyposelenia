@@ -52,7 +52,15 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number = 3000): Promise<
   });
 }
 
-// 同步记录到 Supabase（所有错误都被捕获，不会导致函数崩溃）
+// Supabase 同步结果类型
+interface SyncResult {
+  success: boolean;
+  configured: boolean;
+  error?: string;
+  tableUsed?: string;
+}
+
+// 同步记录到 Supabase（返回详细结果用于调试）
 async function syncRecordToSupabase(record: {
   id: string;
   device_id: string;
@@ -60,12 +68,32 @@ async function syncRecordToSupabase(record: {
   emotion: string;
   emotion_color: string;
   created_at: string;
-}): Promise<void> {
-  const client = getSupabaseClient();
-  if (!client) return;
+}): Promise<SyncResult> {
+  const url = (process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').trim();
+  const key = (process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 
+  if (!url || !key) {
+    return {
+      success: false,
+      configured: false,
+      error: 'Supabase 环境变量未配置 (需要 VITE_SUPABASE_URL 和 VITE_SUPABASE_ANON_KEY)',
+    };
+  }
+
+  let client: any = null;
   try {
-    const doInsert = async () => {
+    let formattedUrl = url;
+    if (!/^https?:\/\//i.test(formattedUrl)) {
+      formattedUrl = 'https://' + formattedUrl;
+    }
+    client = createClient(formattedUrl, key);
+  } catch (err: any) {
+    return { success: false, configured: true, error: '创建 Supabase 客户端失败: ' + err.message };
+  }
+
+  // 尝试写入 mood_records 表
+  try {
+    const doInsert = async (): Promise<SyncResult> => {
       const { error: err1 } = await client.from('mood_records').insert([{
         id: record.id,
         device_id: record.device_id,
@@ -76,19 +104,34 @@ async function syncRecordToSupabase(record: {
       }]);
 
       if (err1) {
-        // 回退到 heart_rate_records 表
-        await client.from('heart_rate_records').insert([{
+        // mood_records 失败，尝试 heart_rate_records 表
+        const { error: err2 } = await client.from('heart_rate_records').insert([{
           user_id: record.device_id,
           device_id: record.device_id,
           heart_rate: record.heart_rate,
           emotion: record.emotion,
           created_at: record.created_at,
         }]);
+
+        if (err2) {
+          return {
+            success: false,
+            configured: true,
+            error: `mood_records: ${err1.message} | heart_rate_records: ${err2.message}`,
+          };
+        }
+        return { success: true, configured: true, tableUsed: 'heart_rate_records' };
       }
+      return { success: true, configured: true, tableUsed: 'mood_records' };
     };
-    await withTimeout(doInsert(), 3000);
-  } catch (err) {
-    console.error('Failed to sync record to Supabase:', err);
+
+    const result = await withTimeout(doInsert(), 5000);
+    if (result === null) {
+      return { success: false, configured: true, error: 'Supabase 请求超时 (5s)' };
+    }
+    return result;
+  } catch (err: any) {
+    return { success: false, configured: true, error: 'Supabase 异常: ' + err.message };
   }
 }
 
@@ -161,11 +204,19 @@ export default async function handler(req: any, res: any) {
       created_at: new Date().toISOString(),
     };
 
-    // 5. 同步到 Supabase（错误不会影响响应）
-    await syncRecordToSupabase(newRecord).catch(() => {});
+    // 5. 同步到 Supabase（返回详细诊断信息）
+    const syncResult = await syncRecordToSupabase(newRecord);
 
-    // 6. 返回成功响应（与原始代码格式一致）
-    return res.status(200).json({ status: 'ok' });
+    // 6. 返回响应（包含 Supabase 诊断信息）
+    return res.status(200).json({
+      status: 'ok',
+      received: {
+        device_id: newRecord.device_id,
+        emotion: newRecord.emotion,
+        heart_rate: newRecord.heart_rate,
+      },
+      supabase: syncResult,
+    });
   } catch (error: any) {
     // 兜底：捕获所有未被内层 try/catch 处理的异常
     console.error('Error handling /data:', error);
