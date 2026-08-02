@@ -182,23 +182,22 @@ const getRecordsFromSupabase = async (): Promise<MoodRecord[] | null> => {
 
 export const app = express();
 
-async function startServer() {
-  const PORT = 3000;
+const PORT = 3000;
 
-  // Middleware
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-  // CORS for external device / testing calls
-  app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    if (req.method === 'OPTIONS') {
-      return res.sendStatus(200);
-    }
-    next();
-  });
+// CORS for external device / testing calls
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
   // Health check API
   app.get('/api/health', (_req, res) => {
@@ -306,9 +305,7 @@ async function startServer() {
     }
   };
 
-  app.post('/api/upload', handleUpload);
-  app.post('/api/mood', handleUpload);
-  app.post('/api/data', handleUpload);
+  app.post(['/data', '/api/data', '/api/upload', '/api/mood', '/api'], handleUpload);
 
   // GET /data endpoint for ESP32 receiving msg query string JSON
   // Example: GET /data?msg={"device_id":"ESP32_MOOD_A01","emotion":"平静","heart_rate":78}
@@ -355,12 +352,11 @@ async function startServer() {
       res.status(200).json({ status: "ok" });
     } catch (error: any) {
       console.error('Error handling GET /data:', error);
-      res.status(400).json({ status: "error", message: error.message });
+      res.status(400).json({ status: "error", message: error?.message || 'Unknown error' });
     }
   };
 
-  app.get('/data', handleGetDataUpload);
-  app.get('/api/data', handleGetDataUpload);
+  app.get(['/data', '/api/data', '/api'], handleGetDataUpload);
 
   // 2. Fetch Records Endpoint
   app.get('/api/records', async (req, res) => {
@@ -449,7 +445,7 @@ async function startServer() {
     });
   });
 
-  // Vite Middleware in Dev Mode
+async function startServer() {
   if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -469,10 +465,13 @@ async function startServer() {
       console.log(`Mood Light Station Server running on http://0.0.0.0:${PORT}`);
     });
   }
-
-  return app;
 }
 
-export const appPromise = startServer();
+if (!process.env.VERCEL) {
+  startServer().catch(err => {
+    console.error('Fatal server start error:', err);
+  });
+}
+
 export default app;
 
