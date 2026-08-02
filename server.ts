@@ -62,7 +62,7 @@ const INITIAL_RECORDS: MoodRecord[] = [
   { id: '10', device_id: 'ESP32_MOOD_A02', heart_rate: 74, emotion: '平静', emotion_color: '#FFFFFF', created_at: new Date(Date.now() - 3600000 * 0.5).toISOString() }
 ];
 
-const DATA_FILE = path.join(process.cwd(), 'mood_records_db.json');
+const DATA_FILE = process.env.VERCEL ? '/tmp/mood_records_db.json' : path.join(process.cwd(), 'mood_records_db.json');
 
 function loadRecordsFromStorage(): MoodRecord[] {
   try {
@@ -164,8 +164,9 @@ const getRecordsFromSupabase = async (): Promise<MoodRecord[] | null> => {
   return null;
 };
 
+export const app = express();
+
 async function startServer() {
-  const app = express();
   const PORT = 3000;
 
   // Middleware
@@ -433,13 +434,13 @@ async function startServer() {
   });
 
   // Vite Middleware in Dev Mode
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
-  } else {
+  } else if (!process.env.VERCEL) {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (_req, res) => {
@@ -447,12 +448,15 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Mood Light Station Server running on http://0.0.0.0:${PORT}`);
-  });
+  if (!process.env.VERCEL) {
+    app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Mood Light Station Server running on http://0.0.0.0:${PORT}`);
+    });
+  }
+
+  return app;
 }
 
-startServer().catch(err => {
-  console.error('Fatal server start error:', err);
-});
+export const appPromise = startServer();
+export default app;
 
