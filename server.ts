@@ -1,7 +1,6 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
-import { createServer as createViteServer } from 'vite';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 interface MoodRecord {
@@ -305,7 +304,7 @@ app.use((req, res, next) => {
     }
   };
 
-  app.post(['/data', '/api/data', '/api/upload', '/api/mood', '/api'], handleUpload);
+  app.post(['/data', '/api/data', '/api/upload', '/api/mood', '/api', '/api/index', '/api/index.ts'], handleUpload);
 
   // GET /data endpoint for ESP32 receiving msg query string JSON
   // Example: GET /data?msg={"device_id":"ESP32_MOOD_A01","emotion":"平静","heart_rate":78}
@@ -356,7 +355,7 @@ app.use((req, res, next) => {
     }
   };
 
-  app.get(['/data', '/api/data', '/api'], handleGetDataUpload);
+  app.get(['/data', '/api/data', '/api', '/api/index', '/api/index.ts'], handleGetDataUpload);
 
   // 2. Fetch Records Endpoint
   app.get('/api/records', async (req, res) => {
@@ -447,6 +446,7 @@ app.use((req, res, next) => {
 
 async function startServer() {
   if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
