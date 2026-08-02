@@ -88,12 +88,15 @@ function saveRecordsToStorage(records: MoodRecord[]): void {
 
 let dbRecords: MoodRecord[] = loadRecordsFromStorage();
 
-// Helper to execute promises with a max timeout
-const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 2500): Promise<T | null> => {
-  return Promise.race([
-    promise,
-    new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs))
-  ]);
+// Helper to execute promises with a max timeout without leaking timers in serverless event loop
+const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 2000): Promise<T | null> => {
+  let timer: NodeJS.Timeout | null = null;
+  const timeoutPromise = new Promise<null>((resolve) => {
+    timer = setTimeout(() => resolve(null), timeoutMs);
+  });
+  return Promise.race([promise, timeoutPromise]).finally(() => {
+    if (timer) clearTimeout(timer);
+  });
 };
 
 // Sync record to Supabase asynchronously
@@ -256,7 +259,7 @@ app.use((req, res, next) => {
 
   // 1. Data Upload Endpoint
   // Supports format: {"device_id":"ESP32_MOOD_A01","emotion":"平静","heart_rate":75}
-  const handleUpload = (req: express.Request, res: express.Response) => {
+  const handleUpload = async (req: express.Request, res: express.Response) => {
     try {
       const body = req.body || {};
       const device_id = body.device_id || body.deviceId || 'ESP32_DEFAULT';
@@ -280,8 +283,8 @@ app.use((req, res, next) => {
       }
       saveRecordsToStorage(dbRecords);
 
-      // Async sync to external Supabase
-      syncRecordToSupabase(newRecord).catch(() => {});
+      // Safely await sync to Supabase with timeout
+      await syncRecordToSupabase(newRecord).catch(() => {});
 
       res.status(201).json({
         success: true,
@@ -299,16 +302,16 @@ app.use((req, res, next) => {
       res.status(400).json({
         success: false,
         error: '格式错误或包含无效数据',
-        details: error.message
+        details: error?.message || 'Unknown error'
       });
     }
   };
 
-  app.post(['/data', '/api/data', '/api/upload', '/api/mood', '/api', '/api/index', '/api/index.ts'], handleUpload);
+  app.post(['/data', '/api/data', '/api/upload', '/api/mood', '/api', '/api/index', '/api/index.ts', '/data.ts', '/api/data.ts'], handleUpload);
 
   // GET /data endpoint for ESP32 receiving msg query string JSON
   // Example: GET /data?msg={"device_id":"ESP32_MOOD_A01","emotion":"平静","heart_rate":78}
-  const handleGetDataUpload = (req: express.Request, res: express.Response) => {
+  const handleGetDataUpload = async (req: express.Request, res: express.Response) => {
     try {
       let dataObj: any = {};
       const msgParam = req.query.msg;
@@ -345,8 +348,8 @@ app.use((req, res, next) => {
       }
       saveRecordsToStorage(dbRecords);
 
-      // Async sync to external Supabase
-      syncRecordToSupabase(newRecord).catch(() => {});
+      // Safely await sync to Supabase with timeout
+      await syncRecordToSupabase(newRecord).catch(() => {});
 
       res.status(200).json({ status: "ok" });
     } catch (error: any) {
@@ -355,7 +358,7 @@ app.use((req, res, next) => {
     }
   };
 
-  app.get(['/data', '/api/data', '/api', '/api/index', '/api/index.ts'], handleGetDataUpload);
+  app.get(['/data', '/api/data', '/api', '/api/index', '/api/index.ts', '/data.ts', '/api/data.ts'], handleGetDataUpload);
 
   // 2. Fetch Records Endpoint
   app.get('/api/records', async (req, res) => {
