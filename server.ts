@@ -89,31 +89,42 @@ function saveRecordsToStorage(records: MoodRecord[]): void {
 
 let dbRecords: MoodRecord[] = loadRecordsFromStorage();
 
+// Helper to execute promises with a max timeout
+const withTimeout = <T>(promise: Promise<T>, timeoutMs: number = 2500): Promise<T | null> => {
+  return Promise.race([
+    promise,
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), timeoutMs))
+  ]);
+};
+
 // Sync record to Supabase asynchronously
 const syncRecordToSupabase = async (record: MoodRecord) => {
   const client = getSupabaseClient();
   if (!client) return;
 
   try {
-    const { error: err1 } = await client.from('mood_records').insert([{
-      id: record.id,
-      device_id: record.device_id,
-      heart_rate: record.heart_rate,
-      emotion: record.emotion,
-      emotion_color: record.emotion_color,
-      created_at: record.created_at
-    }]);
-
-    if (err1) {
-      // Fallback to heart_rate_records table
-      await client.from('heart_rate_records').insert([{
-        user_id: record.device_id,
+    const doInsert = async () => {
+      const { error: err1 } = await client.from('mood_records').insert([{
+        id: record.id,
         device_id: record.device_id,
         heart_rate: record.heart_rate,
         emotion: record.emotion,
+        emotion_color: record.emotion_color,
         created_at: record.created_at
       }]);
-    }
+
+      if (err1) {
+        // Fallback to heart_rate_records table
+        await client.from('heart_rate_records').insert([{
+          user_id: record.device_id,
+          device_id: record.device_id,
+          heart_rate: record.heart_rate,
+          emotion: record.emotion,
+          created_at: record.created_at
+        }]);
+      }
+    };
+    await withTimeout(doInsert(), 3000);
   } catch (err) {
     console.error('Failed to sync record to Supabase:', err);
   }
@@ -125,39 +136,44 @@ const getRecordsFromSupabase = async (): Promise<MoodRecord[] | null> => {
   if (!client) return null;
 
   try {
-    const { data: data1, error: err1 } = await client
-      .from('mood_records')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(300);
+    const fetchQuery = async (): Promise<MoodRecord[] | null> => {
+      const { data: data1, error: err1 } = await client
+        .from('mood_records')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(300);
 
-    if (!err1 && data1 && data1.length > 0) {
-      return data1.map(r => ({
-        id: String(r.id),
-        device_id: r.device_id || 'ESP32_DEFAULT',
-        heart_rate: Number(r.heart_rate) || 75,
-        emotion: r.emotion || '平静',
-        emotion_color: r.emotion_color || EMOTION_COLOR_MAP[r.emotion] || '#FFFFFF',
-        created_at: r.created_at || new Date().toISOString()
-      }));
-    }
+      if (!err1 && data1 && data1.length > 0) {
+        return data1.map(r => ({
+          id: String(r.id),
+          device_id: r.device_id || 'ESP32_DEFAULT',
+          heart_rate: Number(r.heart_rate) || 75,
+          emotion: r.emotion || '平静',
+          emotion_color: r.emotion_color || EMOTION_COLOR_MAP[r.emotion] || '#FFFFFF',
+          created_at: r.created_at || new Date().toISOString()
+        }));
+      }
 
-    const { data: data2, error: err2 } = await client
-      .from('heart_rate_records')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(300);
+      const { data: data2, error: err2 } = await client
+        .from('heart_rate_records')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(300);
 
-    if (!err2 && data2 && data2.length > 0) {
-      return data2.map(r => ({
-        id: String(r.id),
-        device_id: r.device_id || r.user_id || 'ESP32_DEFAULT',
-        heart_rate: Number(r.heart_rate) || 75,
-        emotion: r.emotion || '平静',
-        emotion_color: EMOTION_COLOR_MAP[r.emotion] || '#FFFFFF',
-        created_at: r.created_at || new Date().toISOString()
-      }));
-    }
+      if (!err2 && data2 && data2.length > 0) {
+        return data2.map(r => ({
+          id: String(r.id),
+          device_id: r.device_id || r.user_id || 'ESP32_DEFAULT',
+          heart_rate: Number(r.heart_rate) || 75,
+          emotion: r.emotion || '平静',
+          emotion_color: EMOTION_COLOR_MAP[r.emotion] || '#FFFFFF',
+          created_at: r.created_at || new Date().toISOString()
+        }));
+      }
+      return null;
+    };
+
+    return await withTimeout(fetchQuery(), 2500);
   } catch (err) {
     console.error('Error querying Supabase:', err);
   }

@@ -58,20 +58,23 @@ export const DatabaseUploadAnalytics: React.FC = () => {
     try {
       const filterParam = selectedDeviceFilter !== 'ALL' ? `?device_id=${encodeURIComponent(selectedDeviceFilter)}` : '';
       
-      const [recRes, statsRes, spRes] = await Promise.all([
-        fetch(`/api/records${filterParam}`),
-        fetch(`/api/stats${filterParam}`),
-        fetch('/api/supabase-status')
+      const results = await Promise.allSettled([
+        fetch(`/api/records${filterParam}`).then(r => r.ok ? r.json() : null),
+        fetch(`/api/stats${filterParam}`).then(r => r.ok ? r.json() : null),
+        fetch('/api/supabase-status').then(r => r.ok ? r.json() : null)
       ]);
 
-      if (recRes.ok && statsRes.ok) {
-        const recData = await recRes.json();
-        const statsData = await statsRes.json();
-        setRecords(recData.records || []);
+      const recData = results[0].status === 'fulfilled' ? results[0].value : null;
+      const statsData = results[1].status === 'fulfilled' ? results[1].value : null;
+      const spData = results[2].status === 'fulfilled' ? results[2].value : null;
+
+      if (recData && recData.records) {
+        setRecords(recData.records);
+      }
+      if (statsData) {
         setStats(statsData);
       }
-      if (spRes.ok) {
-        const spData = await spRes.json();
+      if (spData) {
         setSupabaseStatus(spData);
       }
     } catch (err) {
