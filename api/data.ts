@@ -105,6 +105,7 @@ async function syncRecordToSupabase(record: {
 
       if (err1) {
         // mood_records 失败，尝试 heart_rate_records 表
+        // 注意：现有 heart_rate_records 表可能没有 device_id 列，先尝试完整插入，失败后再尝试精简插入
         const { error: err2 } = await client.from('heart_rate_records').insert([{
           user_id: record.device_id,
           device_id: record.device_id,
@@ -114,11 +115,22 @@ async function syncRecordToSupabase(record: {
         }]);
 
         if (err2) {
-          return {
-            success: false,
-            configured: true,
-            error: `mood_records: ${err1.message} | heart_rate_records: ${err2.message}`,
-          };
+          // 精简插入：去掉 device_id 列（兼容旧表结构）
+          const { error: err3 } = await client.from('heart_rate_records').insert([{
+            user_id: record.device_id,
+            heart_rate: record.heart_rate,
+            emotion: record.emotion,
+            created_at: record.created_at,
+          }]);
+
+          if (err3) {
+            return {
+              success: false,
+              configured: true,
+              error: `mood_records: ${err1.message} | heart_rate_records(精简): ${err3.message}`,
+            };
+          }
+          return { success: true, configured: true, tableUsed: 'heart_rate_records (精简模式, 无 device_id 列)' };
         }
         return { success: true, configured: true, tableUsed: 'heart_rate_records' };
       }
