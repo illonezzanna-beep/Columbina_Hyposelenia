@@ -152,7 +152,7 @@ export const TeacherDashboard: React.FC = () => {
               </button>
             )}
           </div>
-          <p className="text-gray-500">通过输入设备 ID 实时调取班级或个人情绪变动曲线。</p>
+          <p className="text-gray-500">通过输入设备 ID 实时调取学生或个人情绪变动曲线。</p>
         </div>
 
         <form onSubmit={handleSearch} className="flex w-full md:w-auto gap-3">
