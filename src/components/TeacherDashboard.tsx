@@ -31,6 +31,33 @@ const getSanitizedBrokerUrl = (rawUrl?: string): string => {
   return url;
 };
 
+// 情绪等级映射 (Y轴从上到下: 0=兴奋, 1=开心, 2=愉悦, 3=平静, 4=悲伤, 5=愤怒, 6=焦虑, 7=恐惧)
+const EMOTION_LEVELS = [
+  { name: '兴奋', level: 0, color: '#FFC0CB' },
+  { name: '开心', level: 1, color: '#FFD700' },
+  { name: '愉悦', level: 2, color: '#FFB6C1' },
+  { name: '平静', level: 3, color: '#CBD5E1' },
+  { name: '悲伤', level: 4, color: '#3B82F6' },
+  { name: '愤怒', level: 5, color: '#EF4444' },
+  { name: '焦虑', level: 6, color: '#22C55E' },
+  { name: '恐惧', level: 7, color: '#A855F7' },
+];
+
+const EMOTION_TO_LEVEL: Record<string, number> = {};
+EMOTION_LEVELS.forEach(e => { EMOTION_TO_LEVEL[e.name] = e.level; });
+
+function getEmotionColor(emotion: string): string {
+  const found = EMOTION_LEVELS.find(e => e.name === emotion);
+  if (found) return found.color;
+  // Fallback to EMOTION_MAP from types
+  const map: Record<string, string> = {
+    '平静': '#FFFFFF', '愉悦': '#FFB6C1', '兴奋': '#FFC0CB',
+    '焦虑': '#00FF00', '愤怒': '#FF0000', '恐惧': '#800080',
+    '悲伤': '#0000FF', '开心': '#FFD700',
+  };
+  return map[emotion] || '#6366f1';
+}
+
 export const TeacherDashboard: React.FC = () => {
   const [deviceId, setDeviceId] = useState('');
   const [searchId, setSearchId] = useState('');
@@ -115,6 +142,14 @@ export const TeacherDashboard: React.FC = () => {
     return [...data].reverse().find(d => d.deviceId === searchId) || null;
   }, [data, searchId, lastMessage]);
 
+  // 将过滤后的数据映射为图表数据: 添加 emotionLevel 字段 (0-7)
+  const emotionChartData = useMemo(() => {
+    return filteredData.map(d => ({
+      ...d,
+      emotionLevel: EMOTION_TO_LEVEL[d.emotion] ?? 3,
+    }));
+  }, [filteredData]);
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setSearchId(deviceId);
@@ -182,116 +217,110 @@ export const TeacherDashboard: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-8">
-          {/* Real-time Status Card */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="md:col-span-1 bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm flex flex-col justify-between">
-              <div>
-                <div className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">实时心情状态</div>
-                <div className="flex items-center gap-4 mb-2">
-                  <div 
-                    className="w-4 h-4 rounded-full shadow-lg" 
-                    style={{ 
-                      backgroundColor: currentDevice?.emotionColor || '#f0f0f0',
-                      boxShadow: `0 0 15px ${currentDevice?.emotionColor || 'transparent'}`
-                    }} 
-                  />
-                  <span className="text-3xl font-black text-gray-900">
-                    {currentDevice?.emotion || '等待中'}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-500">
-                  设备：{currentDevice?.deviceId || '全频道'}
-                </p>
-              </div>
-              <div className="mt-8 pt-8 border-t border-gray-50 flex items-center gap-3">
-                <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center">
-                  <Activity className="w-5 h-5" />
-                </div>
-                <div>
-                   <div className="text-2xl font-black text-gray-900 leading-none">
-                     {currentDevice?.heartRate || '--'}
-                   </div>
-                   <div className="text-[10px] font-bold text-gray-400 uppercase mt-1">BPM 心率值</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Main Trend Chart */}
-            <div className="md:col-span-3 bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden">
+          {/* Emotion Timeline Chart */}
+          <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm relative overflow-hidden">
                <div className="flex items-center justify-between mb-8">
                   <h3 className="text-xl font-bold flex items-center gap-2">
                     <LayoutDashboard className="w-5 h-5 text-indigo-500" />
                     情绪轨迹追踪
                   </h3>
-                  <div className="flex items-center gap-2 text-xs font-bold text-gray-400">
-                    <span className="w-3 h-3 rounded-full bg-indigo-500" /> 心率趋势
+                  <div className="flex flex-wrap items-center gap-3 text-xs font-bold text-gray-400">
+                    {EMOTION_LEVELS.map(e => (
+                      <span key={e.name} className="flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: e.color, border: e.color === '#FFFFFF' || e.color === '#CBD5E1' ? '1px solid #cbd5e1' : 'none' }} />
+                        {e.name}
+                      </span>
+                    ))}
                   </div>
                </div>
-               
-               <div className="h-80 w-full">
+
+               <div className="h-96 w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={filteredData}>
+                    <LineChart data={emotionChartData}>
                       <defs>
-                        <linearGradient id="colorHr" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
-                          <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                        <linearGradient id="emotionLineGradient" x1="0" y1="0" x2="1" y2="0">
+                          {emotionChartData.length > 0 && emotionChartData.map((d, i) => (
+                            <stop
+                              key={i}
+                              offset={emotionChartData.length > 1 ? `${(i / (emotionChartData.length - 1)) * 100}%` : '0%'}
+                              stopColor={getEmotionColor(d.emotion)}
+                              stopOpacity={1}
+                            />
+                          ))}
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                      <XAxis 
-                        dataKey="timestamp" 
-                        hide 
-                      />
-                      <YAxis 
-                        domain={['dataMin - 10', 'dataMax + 10']} 
-                        axisLine={false} 
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis
+                        dataKey="timestamp"
+                        tickFormatter={(t) => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                        tick={{ fontSize: 11, fill: '#94a3b8' }}
+                        axisLine={false}
                         tickLine={false}
-                        tick={{ fontSize: 12, fill: '#94a3b8' }}
+                        interval="preserveStartEnd"
                       />
-                      <Tooltip 
+                      <YAxis
+                        type="number"
+                        domain={[-0.5, 7.5]}
+                        ticks={[0, 1, 2, 3, 4, 5, 6, 7]}
+                        tickFormatter={(level) => EMOTION_LEVELS[level]?.name || ''}
+                        tick={{ fontSize: 13, fill: '#64748b', fontWeight: 600 }}
+                        axisLine={false}
+                        tickLine={false}
+                        width={60}
+                      />
+                      <Tooltip
                         content={({ active, payload }) => {
                           if (active && payload && payload.length) {
-                            const d = payload[0].payload as MqttEmotionData;
+                            const d = payload[0].payload as MqttEmotionData & { emotionLevel: number };
                             return (
                               <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800 shadow-2xl">
-                                <div className="text-xs font-bold text-gray-500 mb-2">{new Date(d.timestamp).toLocaleTimeString()}</div>
-                                <div className="flex items-center gap-2 mb-1">
-                                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: d.emotionColor }} />
-                                  <span className="text-white font-bold">{d.emotion}</span>
+                                <div className="text-xs font-bold text-gray-500 mb-2">
+                                  {new Date(d.timestamp).toLocaleTimeString()}
                                 </div>
-                                <div className="text-indigo-400 font-black text-xl">{d.heartRate} <span className="text-xs opacity-50">BPM</span></div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getEmotionColor(d.emotion) }} />
+                                  <span className="text-white font-bold text-lg">{d.emotion}</span>
+                                </div>
+                                <div className="text-indigo-400 font-black text-xl">
+                                  {d.heartRate} <span className="text-xs opacity-50">BPM</span>
+                                </div>
+                                <div className="text-gray-500 text-xs mt-1">设备: {d.deviceId}</div>
                               </div>
                             );
                           }
                           return null;
                         }}
                       />
-                      <Area 
-                        type="monotone" 
-                        dataKey="heartRate" 
-                        stroke="#6366f1" 
+                      <Line
+                        type="monotone"
+                        dataKey="emotionLevel"
+                        stroke="url(#emotionLineGradient)"
                         strokeWidth={3}
-                        fillOpacity={1} 
-                        fill="url(#colorHr)" 
+                        dot={(props: any) => {
+                          const { cx, cy, payload, index } = props;
+                          if (cx == null || cy == null) return <g key={index} />;
+                          const color = getEmotionColor(payload.emotion);
+                          return (
+                            <circle
+                              key={index}
+                              cx={cx}
+                              cy={cy}
+                              r={4}
+                              fill={color}
+                              stroke={color === '#FFFFFF' || color === '#CBD5E1' ? '#cbd5e1' : color}
+                              strokeWidth={1}
+                              style={{ filter: `drop-shadow(0 0 3px ${color}80)` }}
+                            />
+                          );
+                        }}
+                        activeDot={{ r: 6, fill: '#6366f1' }}
+                        connectNulls
                         animationDuration={500}
                       />
-                    </AreaChart>
+                    </LineChart>
                   </ResponsiveContainer>
                </div>
-               
-               <div className="mt-6 flex gap-2">
-                  {filteredData.slice(-10).map((d, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="flex-1 h-2 rounded-full"
-                      style={{ backgroundColor: d.emotionColor }}
-                    />
-                  ))}
-               </div>
             </div>
-          </div>
 
           {/* History Feed */}
           <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
