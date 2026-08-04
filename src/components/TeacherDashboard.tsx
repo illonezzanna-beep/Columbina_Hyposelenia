@@ -299,7 +299,10 @@ export const TeacherDashboard: React.FC = () => {
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis
                         dataKey="timestamp"
-                        tickFormatter={(t) => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                        tickFormatter={(t) => {
+                          const d = new Date(t);
+                          return `${d.getMonth() + 1}月${d.getDate()}日`;
+                        }}
                         tick={{ fontSize: 11, fill: '#94a3b8' }}
                         axisLine={false}
                         tickLine={false}
@@ -319,13 +322,15 @@ export const TeacherDashboard: React.FC = () => {
                         content={({ active, payload }) => {
                           if (active && payload && payload.length) {
                             const d = payload[0].payload as MqttEmotionData & { emotionLevel: number };
+                            const date = new Date(d.timestamp);
+                            const dateStr = `${date.getMonth() + 1}月${date.getDate()}日`;
+                            const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                             return (
                               <div className="bg-gray-900 p-4 rounded-2xl border border-gray-800 shadow-2xl">
-                                <div className="text-xs font-bold text-gray-500 mb-2">
-                                  {new Date(d.timestamp).toLocaleTimeString()}
-                                </div>
-                                <div className="flex items-center gap-2 mb-1">
-                                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getEmotionColor(d.emotion) }} />
+                                <div className="text-xs font-bold text-gray-400 mb-1">{dateStr}</div>
+                                <div className="text-xs font-medium text-gray-500 mb-3">{timeStr}</div>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: getEmotionColor(d.emotion), border: getEmotionColor(d.emotion) === '#FFFFFF' ? '1px solid #cbd5e1' : 'none' }} />
                                   <span className="text-white font-bold text-lg">{d.emotion}</span>
                                 </div>
                                 <div className="text-indigo-400 font-black text-xl">
