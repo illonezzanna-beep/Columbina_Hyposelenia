@@ -10,6 +10,22 @@
     "api/index.ts": {
       "maxDuration": 15,
       "memory": 1024
+    },
+    "api/stats.ts": {
+      "maxDuration": 15,
+      "memory": 1024
+    },
+    "api/records.ts": {
+      "maxDuration": 15,
+      "memory": 1024
+    },
+    "api/supabase-status.ts": {
+      "maxDuration": 15,
+      "memory": 1024
+    },
+    "api/upload.ts": {
+      "maxDuration": 15,
+      "memory": 1024
     }
   },
   "rewrites": [
