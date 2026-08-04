@@ -9,7 +9,7 @@ import {
   Wifi, WifiOff, History, LayoutDashboard
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MqttEmotionData, EMOTION_MAP } from '../types';
+import { MqttEmotionData, EMOTION_MAP, DatabaseRecord } from '../types';
 import { cn } from '../lib/utils';
 
 const BROKER_LIST = [
@@ -62,6 +62,8 @@ export const TeacherDashboard: React.FC = () => {
   const [deviceId, setDeviceId] = useState('');
   const [searchId, setSearchId] = useState('');
   const [data, setData] = useState<MqttEmotionData[]>([]);
+  const [dbRecords, setDbRecords] = useState<DatabaseRecord[]>([]);
+  const [isLoadingDb, setIsLoadingDb] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'error'>('connecting');
   const [currentBrokerIndex, setCurrentBrokerIndex] = useState(0);
@@ -132,23 +134,57 @@ export const TeacherDashboard: React.FC = () => {
     };
   }, [activeBrokerUrl, customBroker]);
 
+  // 从数据库 /api/records 获取历史数据（用于图表和历史数据流）
+  const fetchDbRecords = useCallback(async () => {
+    try {
+      const filterParam = searchId ? `?device_id=${encodeURIComponent(searchId)}` : '';
+      const res = await fetch(`/api/records${filterParam}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.records) {
+          // 过滤掉 emotion='启动' 的记录
+          const filtered = json.records.filter((r: DatabaseRecord) => r.emotion !== '启动');
+          setDbRecords(filtered);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch database records:', err);
+    } finally {
+      setIsLoadingDb(false);
+    }
+  }, [searchId]);
+
+  useEffect(() => {
+    fetchDbRecords();
+    const interval = setInterval(fetchDbRecords, 8000);
+    return () => clearInterval(interval);
+  }, [fetchDbRecords]);
+
+  // 将数据库记录转换并按时间正序排列（旧→新），用于绘制曲线
+  const chartData = useMemo(() => {
+    return [...dbRecords]
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      .map(r => ({
+        timestamp: r.created_at,
+        heartRate: r.heart_rate,
+        emotion: r.emotion,
+        emotionColor: r.emotion_color || getEmotionColor(r.emotion),
+        deviceId: r.device_id,
+        emotionLevel: EMOTION_TO_LEVEL[r.emotion] ?? 3,
+      }));
+  }, [dbRecords]);
+
   const filteredData = useMemo(() => {
-    if (!searchId) return data;
-    return data.filter(d => d.deviceId === searchId);
-  }, [data, searchId]);
+    return chartData;
+  }, [chartData]);
 
   const currentDevice = useMemo(() => {
-    if (!searchId) return lastMessage;
-    return [...data].reverse().find(d => d.deviceId === searchId) || null;
-  }, [data, searchId, lastMessage]);
+    if (chartData.length === 0) return null;
+    return chartData[chartData.length - 1];
+  }, [chartData]);
 
-  // 将过滤后的数据映射为图表数据: 添加 emotionLevel 字段 (0-7)
-  const emotionChartData = useMemo(() => {
-    return filteredData.map(d => ({
-      ...d,
-      emotionLevel: EMOTION_TO_LEVEL[d.emotion] ?? 3,
-    }));
-  }, [filteredData]);
+  // 图表数据已直接从 chartData 获取（包含 emotionLevel 字段）
+  const emotionChartData = chartData;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -207,13 +243,24 @@ export const TeacherDashboard: React.FC = () => {
         </form>
       </div>
 
-      {searchId && filteredData.length === 0 ? (
+      {isLoadingDb ? (
+        <div className="bg-white p-20 rounded-[3rem] border border-gray-100 text-center flex flex-col items-center shadow-sm">
+          <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center mb-6 text-gray-300">
+            <History className="w-10 h-10 animate-pulse" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">正在加载历史数据...</h3>
+        </div>
+      ) : filteredData.length === 0 ? (
         <div className="bg-white p-20 rounded-[3rem] border border-gray-100 text-center flex flex-col items-center shadow-sm">
           <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center mb-6 text-gray-300">
             <History className="w-10 h-10" />
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">未找到实时数据</h3>
-          <p className="text-gray-500 max-w-xs">当前设备 ID "{searchId}" 尚未上传实时情绪包，请检查硬件连接状态。</p>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">暂无历史数据</h3>
+          <p className="text-gray-500 max-w-xs">
+            {searchId
+              ? `设备 ID "${searchId}" 在数据库中暂无记录，请确认设备 ID 或等待数据上报。`
+              : '数据库中暂无情绪记录，请通过数据上报页面上传数据后再查看。'}
+          </p>
         </div>
       ) : (
         <div className="space-y-8">
@@ -327,10 +374,10 @@ export const TeacherDashboard: React.FC = () => {
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-xl font-bold">历史数据流</h3>
               <button 
-                onClick={() => setData([])}
+                onClick={() => fetchDbRecords()}
                 className="text-xs font-bold text-rose-500 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-colors"
               >
-                重置流
+                刷新数据
               </button>
             </div>
             <div className="max-h-96 overflow-y-auto space-y-3 pr-2 scrollbar-hide">
