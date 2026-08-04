@@ -67,6 +67,7 @@ async function getRecordsFromSupabase(): Promise<MoodRecord[] | null> {
       const { data: data1, error: err1 } = await client
         .from('mood_records')
         .select('*')
+        .neq('emotion', '启动')
         .order('created_at', { ascending: false })
         .limit(500);
 
@@ -84,6 +85,7 @@ async function getRecordsFromSupabase(): Promise<MoodRecord[] | null> {
       const { data: data2, error: err2 } = await client
         .from('heart_rate_records')
         .select('*')
+        .neq('emotion', '启动')
         .order('created_at', { ascending: false })
         .limit(500);
 

@@ -64,10 +64,11 @@ async function getRecordsFromSupabase(): Promise<MoodRecord[] | null> {
 
   try {
     const fetchQuery = async (): Promise<MoodRecord[] | null> => {
-      // 优先查询 mood_records 表
+      // 优先查询 mood_records 表（过滤掉 emotion='启动' 的记录）
       const { data: data1, error: err1 } = await client
         .from('mood_records')
         .select('*')
+        .neq('emotion', '启动')
         .order('created_at', { ascending: false })
         .limit(500);
 
@@ -86,6 +87,7 @@ async function getRecordsFromSupabase(): Promise<MoodRecord[] | null> {
       const { data: data2, error: err2 } = await client
         .from('heart_rate_records')
         .select('*')
+        .neq('emotion', '启动')
         .order('created_at', { ascending: false })
         .limit(500);
 
