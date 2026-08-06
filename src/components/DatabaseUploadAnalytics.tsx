@@ -305,26 +305,6 @@ export const DatabaseUploadAnalytics: React.FC = () => {
         >
           <PieIcon className="w-4 h-4" /> 扇形统计图与汇总
         </button>
-        <button
-          onClick={() => setActiveTab('tester')}
-          className={`px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shrink-0 ${
-            activeTab === 'tester'
-              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100'
-              : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'
-          }`}
-        >
-          <Send className="w-4 h-4" /> 在线模拟上传数据
-        </button>
-        <button
-          onClick={() => setActiveTab('code')}
-          className={`px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shrink-0 ${
-            activeTab === 'code'
-              ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-100'
-              : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-100'
-          }`}
-        >
-          <Terminal className="w-4 h-4" /> ESP32 / cURL 上传代码
-        </button>
       </div>
 
       {/* TAB 1: Analytics & Pie Chart */}
