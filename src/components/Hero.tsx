@@ -229,26 +229,6 @@ if (millis() - lastRecordTime >= 5000) {
          </div>
       </section>
 
-      {/* CTA Section */}
-      <section id="contact" className="py-32 bg-gray-50">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="bg-indigo-600 rounded-[4rem] p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
-            <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-white/10 blur-[100px] rounded-full" />
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-8">开启专业级<br />情绪量化监测</h2>
-            <p className="text-xl text-indigo-100 mb-12 max-w-2xl mx-auto">
-              不仅仅是灯光，更是每一份真实的心理快照。立即获取完整硬件清单与烧录指南。
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <button className="px-10 py-5 bg-white text-indigo-600 rounded-2xl font-bold text-lg hover:bg-indigo-50 transition-all shadow-xl">
-                下载原理图 (PDF)
-              </button>
-              <button className="px-10 py-5 bg-indigo-900 text-white rounded-2xl font-bold text-lg hover:bg-indigo-950 transition-all">
-                加入开发者群
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>
   );
 };
