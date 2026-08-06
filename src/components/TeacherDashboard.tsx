@@ -380,7 +380,7 @@ export const TeacherDashboard: React.FC = () => {
               <h3 className="text-xl font-bold">历史数据流</h3>
               <button 
                 onClick={() => fetchDbRecords()}
-                className="text-xs font-bold text-rose-500 hover:bg-rose-50 px-3 py-1.5 rounded-lg transition-colors"
+                className="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100"
               >
                 刷新数据
               </button>
@@ -397,8 +397,11 @@ export const TeacherDashboard: React.FC = () => {
                   >
                     <div className="flex items-center gap-4">
                       <div 
-                        className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-black shadow-lg"
-                        style={{ backgroundColor: record.emotionColor }}
+                        className="w-12 h-12 rounded-xl flex items-center justify-center font-black shadow-lg"
+                        style={{ 
+                          backgroundColor: record.emotionColor,
+                          color: record.emotionColor === '#FFFFFF' || record.emotionColor === '#CBD5E1' ? '#1f2937' : '#ffffff'
+                        }}
                       >
                          {record.heartRate}
                       </div>
