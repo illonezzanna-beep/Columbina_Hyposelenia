@@ -39,9 +39,6 @@ export const Hero: React.FC = () => {
                 查看核心功能
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
-              <button className="px-10 py-5 bg-white text-gray-900 border-2 border-gray-100 rounded-2xl font-bold text-lg hover:border-indigo-100 hover:bg-indigo-50/30 transition-all">
-                硬件规格书
-              </button>
             </div>
           </motion.div>
 

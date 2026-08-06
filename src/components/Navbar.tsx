@@ -43,9 +43,6 @@ export const Navbar: React.FC = () => {
                 {item.label}
               </button>
             ))}
-            <button className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100">
-              预约演示
-            </button>
           </div>
 
           <div className="md:hidden">
@@ -68,9 +65,6 @@ export const Navbar: React.FC = () => {
               {item.label}
             </button>
           ))}
-          <button className="w-full px-4 py-4 bg-indigo-600 text-white font-bold rounded-xl">
-            预约演示
-          </button>
         </div>
       )}
     </nav>
