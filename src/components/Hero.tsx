@@ -41,62 +41,6 @@ export const Hero: React.FC = () => {
               </button>
             </div>
           </motion.div>
-
-          {/* Device Mockup */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="mt-24 relative max-w-5xl mx-auto"
-          >
-            <div className="relative aspect-[16/9] bg-gray-900 rounded-[3rem] shadow-3xl overflow-hidden border-[12px] border-white ring-1 ring-gray-100 p-12">
-               {/* NeoPixel Ring Simulation */}
-               <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="relative w-80 h-80 rounded-full border-[10px] border-gray-800 flex items-center justify-center">
-                    {Array.from({ length: 24 }).map((_, i) => (
-                      <motion.div
-                        key={i}
-                        animate={{ 
-                          opacity: [0.3, 1, 0.3],
-                          scale: [1, 1.1, 1],
-                          backgroundColor: ['#ffffff', '#ffb6c1', '#ffffff']
-                        }}
-                        transition={{ 
-                          duration: 2, 
-                          repeat: Infinity, 
-                          delay: i * 0.05 
-                        }}
-                        className="absolute w-4 h-4 rounded-full blur-[2px] shadow-lg"
-                        style={{
-                          transform: `rotate(${i * 15}deg) translateY(-145px)`
-                        }}
-                      />
-                    ))}
-                    <div className="text-center z-10">
-                      <Heart className="w-16 h-16 text-rose-500 mx-auto mb-2 animate-pulse fill-rose-500/20" />
-                      <div className="text-4xl font-black text-white">75</div>
-                      <div className="text-[10px] text-gray-500 font-bold tracking-[0.2em]">BASELINE BPM</div>
-                    </div>
-                  </div>
-               </div>
-               
-               {/* Floating Overlay Status */}
-               <div className="absolute bottom-8 left-8 right-8 flex justify-between items-end">
-                  <div className="bg-black/40 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/10 text-left">
-                    <div className="text-[10px] font-bold text-gray-400 uppercase mb-1">系统状态</div>
-                    <div className="flex items-center gap-2">
-                       <div className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-                       <span className="text-white font-bold">WiFi 已连接: SparkMinds_IOT</span>
-                    </div>
-                  </div>
-                  <div className="bg-indigo-600 px-6 py-4 rounded-2xl shadow-xl text-left">
-                    <div className="text-[10px] font-bold text-indigo-200 uppercase mb-1">心情日记</div>
-                    <div className="text-white font-black text-xl">已记录 432 条</div>
-                  </div>
-               </div>
-            </div>
-          </motion.div>
         </div>
       </section>
 
